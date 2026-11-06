@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Relocation, Housing Lease Analyzer & Visa Survival System — Konkuk University</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Inter & JetBrains Mono Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        konkuk: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .tab-active {
+            background-color: #047857;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(4, 120, 87, 0.25);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased">
+
+    <!-- Top University & Project Header -->
+    <header class="bg-gradient-to-r from-konkuk-900 via-konkuk-800 to-slate-900 text-white shadow-lg border-b border-konkuk-700 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-start sm:items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0 shadow-inner">
+                        <i data-lucide="shield-check" class="w-7 h-7 text-emerald-300"></i>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-200 rounded-full border border-emerald-400/30">
+                                Konkuk University • Basic Programming Using Python
+                            </span>
+                            <span class="px-2.5 py-0.5 text-xs font-mono bg-slate-800 text-slate-300 rounded-full border border-slate-700">
+                                Live Prototype v2.0
+                            </span>
+                        </div>
+                        <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white mt-1">
+                            Smart Relocation, Housing Lease Analyzer & Visa Survival System
+                        </h1>
+                        <p class="text-xs sm:text-sm text-emerald-100/80">
+                            Developer: <strong class="text-white">Sazal Md Rashedul Islam</strong> &nbsp;|&nbsp; Student ID: <strong class="font-mono text-emerald-300">202616321</strong> &nbsp;|&nbsp; Target Area: Hwayang-dong / Konkuk Univ.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="switchTab('terminal')" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-600 transition shadow-sm">
+                        <i data-lucide="terminal" class="w-4 h-4"></i>
+                        <span>Python CLI Simulator</span>
+                    </button>
+                    <button onclick="downloadJsonDb()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Export JSON DB</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-white border-b border-slate-200 shadow-sm sticky top-[88px] sm:top-[84px] z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+            <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2" aria-label="Tabs">
+                <button id="tab-btn-housing" onclick="switchTab('housing')" class="tab-active flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+                    <i data-lucide="building-2" class="w-4 h-4"></i>
+                    <span>1. Smart Housing Finder</span>
+                </button>
+                <button id="tab-btn-lease" onclick="switchTab('lease')" class="text-slate-600 hover:bg-slate-100 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+                    <i data-lucide="file-warning" class="w-4 h-4"></i>
+                    <span>2. Lease Scam Analyzer</span>
+                </button>
+                <button id="tab-btn-visa" onclick="switchTab('visa')" class="text-slate-600 hover:bg-slate-100 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                    <span>3. D-2 Visa & 6M Budget</span>
+                </button>
+                <button id="tab-btn-deadlines" onclick="switchTab('deadlines')" class="text-slate-600 hover:bg-slate-100 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+                    <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+                    <span>4. ARC 14-Day Tracker & DB</span>
+                </button>
+                <button id="tab-btn-terminal" onclick="switchTab('terminal')" class="text-slate-600 hover:bg-slate-100 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+                    <i data-lucide="terminal-square" class="w-4 h-4"></i>
+                    <span>5. Live Python Terminal</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-emerald-500/40 flex items-center gap-3 text-sm">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+        <span id="toast-msg">Action completed!</span>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- MODULE 1: SMART HOUSING RECOMMENDER        -->
+        <!-- ========================================== -->
+        <section id="panel-housing" class="space-y-6">
+            <!-- Top Intro Banner -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md mb-1">
+                        <span>FUNC-03 • Multi-Factor Scoring Algorithm</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900">Konkuk Univ. Smart Housing Recommender & Currency Converter</h2>
+                    <p class="text-sm text-slate-600 mt-0.5">
+                        Enter your budget in <strong>BDT (Bangladeshi Taka)</strong>, <strong>USD</strong>, or <strong>KRW</strong>. The system ranks rooms near Konkuk University using a 100-point weighted suitability score: <strong>Monthly Affordability (45%)</strong>, <strong>Deposit Fit (30%)</strong>, and <strong>Campus Walk Proximity (25%)</strong>.
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 shrink-0 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-mono">
+                    <div class="px-2.5 py-1 bg-white rounded-lg border border-slate-200">
+                        <span class="text-slate-400">Rate:</span> <strong class="text-slate-800">1 BDT = 11.5 KRW</strong>
+                    </div>
+                    <div class="px-2.5 py-1 bg-white rounded-lg border border-slate-200">
+                        <span class="text-slate-400">Rate:</span> <strong class="text-slate-800">1 USD = 1,380 KRW</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Column: Budget Controls & Add Room -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- Budget Converter Card -->
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-emerald-600"></i>
+                            <span>Student Budget Parameters</span>
+                        </h3>
+
+                        <!-- Currency Selector -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Input Currency</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setCurrency('BDT')" id="curr-BDT" class="py-2 px-3 rounded-xl text-xs font-bold border transition bg-emerald-600 text-white border-emerald-600">
+                                    BDT (৳)
+                                </button>
+                                <button onclick="setCurrency('KRW')" id="curr-KRW" class="py-2 px-3 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+                                    KRW (₩)
+                                </button>
+                                <button onclick="setCurrency('USD')" id="curr-USD" class="py-2 px-3 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+                                    USD ($)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Max Deposit Input -->
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1">
+                                <label for="input-deposit" class="text-slate-700">Max Deposit (Bojeung-geum)</label>
+                                <span id="converted-deposit-label" class="font-mono text-emerald-700">≈ 5,002,500 KRW</span>
+                            </div>
+                            <input type="number" id="input-deposit" value="435000" min="1000" step="1000" oninput="updateHousingScores()"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                        </div>
+
+                        <!-- Max Monthly Rent + Gwanlibi Input -->
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1">
+                                <label for="input-monthly" class="text-slate-700">Max Monthly (Wolse + Gwanlibi)</label>
+                                <span id="converted-monthly-label" class="font-mono text-emerald-700">≈ 517,500 KRW</span>
+                            </div>
+                            <input type="number" id="input-monthly" value="45000" min="500" step="500" oninput="updateHousingScores()"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                        </div>
+
+                        <!-- Preset Student Profiles -->
+                        <div class="pt-2 border-t border-slate-100">
+                            <span class="block text-xs font-semibold text-slate-500 mb-2">Quick Budget Presets:</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="applyBudgetPreset('BDT', 435000, 45000)" class="text-xs px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-medium transition">
+                                    Standard One-Room (4.35L BDT)
+                                </button>
+                                <button onclick="applyBudgetPreset('BDT', 50000, 35000)" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">
+                                    Low-Deposit Gosiwon (50K BDT)
+                                </button>
+                                <button onclick="applyBudgetPreset('KRW', 10000000, 650000)" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">
+                                    High Budget (10M KRW)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Custom Konkuk Listing Card -->
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3.5">
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i>
+                            <span>Add Custom Room Near Campus</span>
+                        </h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div>
+                                <label class="font-semibold text-slate-700 block mb-1">Building / Listing Name</label>
+                                <input id="new-room-name" type="text" placeholder="e.g., Seongsu Station Studio" class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:border-emerald-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="font-semibold text-slate-700 block mb-1">Room Type</label>
+                                    <select id="new-room-type" class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none bg-white">
+                                        <option value="One-Room">One-Room</option>
+                                        <option value="Gosiwon">Gosiwon</option>
+                                        <option value="Sharehouse">Sharehouse</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-slate-700 block mb-1">Walk to Konkuk (mins)</label>
+                                    <input id="new-room-walk" type="number" value="9" min="1" max="60" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="font-semibold text-slate-700 block mb-1">Deposit (KRW)</label>
+                                    <input id="new-room-dep" type="number" value="3000000" step="500000" class="w-full px-2.5 py-2 rounded-xl border border-slate-300 font-mono">
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-slate-700 block mb-1">Rent (KRW)</label>
+                                    <input id="new-room-rent" type="number" value="400000" step="10000" class="w-full px-2.5 py-2 rounded-xl border border-slate-300 font-mono">
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-slate-700 block mb-1">Gwanlibi (KRW)</label>
+                                    <input id="new-room-gwan" type="number" value="50000" step="10000" class="w-full px-2.5 py-2 rounded-xl border border-slate-300 font-mono">
+                                </div>
+                            </div>
+                            <button onclick="addCustomListing()" class="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition flex items-center justify-center gap-1.5 mt-1">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span>Add to Local Database & Re-Rank</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Ranked Housing Cards -->
+                <div class="lg:col-span-8 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 bg-white px-5 py-3.5 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-sm font-bold text-slate-800">Live Ranked Recommendations Near Konkuk University</span>
+                        </div>
+                        <span id="housing-count-badge" class="text-xs font-mono bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg">5 Listings Evaluated</span>
+                    </div>
+
+                    <div id="housing-cards-container" class="space-y-3.5">
+                        <!-- Populated dynamically by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- MODULE 2: KOREAN LEASE SCAM ANALYZER       -->
+        <!-- ========================================== -->
+        <section id="panel-lease" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md mb-1">
+                    <span>FUNC-04 • Deunggibudeungbon Debt-to-Value Analyzer</span>
+                </div>
+                <h2 class="text-xl font-bold text-slate-900">Korean Lease Contract Scam & Deposit Risk Analyzer</h2>
+                <p class="text-sm text-slate-600 mt-0.5">
+                    Protects foreign students against <em>Kkangtong Jeonse/Wolse</em> (깡통전세) fraud where landlords default on mortgages and tenants lose their security deposit. Formula: <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">((Prior Building Debt + Your Deposit) / Building Value) × 100</code>.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Inputs -->
+                <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="file-search" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Building Registry (등기부등본) Figures</span>
+                    </h3>
+
+                    <div>
+                        <span class="block text-xs font-semibold text-slate-500 mb-2">Quick-Load Konkuk Property to Inspect:</span>
+                        <div id="lease-preset-buttons" class="flex flex-wrap gap-1.5">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">1. Estimated Building Market Value (KRW)</label>
+                        <input type="number" id="lease-bldg-val" value="800000000" step="10000000" oninput="runLeaseRiskAnalysis()"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">2. Landlord's Prior Mortgage / Debt — Geunjeodanggwon (KRW)</label>
+                        <input type="number" id="lease-prior-debt" value="200000000" step="10000000" oninput="runLeaseRiskAnalysis()"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">3. Your Required Security Deposit — Bojeung-geum (KRW)</label>
+                        <input type="number" id="lease-deposit" value="5000000" step="1000000" oninput="runLeaseRiskAnalysis()"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span>Safe Threshold: <strong>&lt; 60%</strong></span>
+                        <span>Caution: <strong>60%–75%</strong></span>
+                        <span>Danger: <strong>&gt; 75%</strong></span>
+                    </div>
+                </div>
+
+                <!-- Right Output Gauge & Checklist -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-5">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                            <div>
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Encumbrance & Liability Ratio</span>
+                                <div class="flex items-baseline gap-3 mt-1">
+                                    <span id="lease-ratio-text" class="text-4xl font-extrabold font-mono text-slate-900">25.63%</span>
+                                    <span id="lease-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                        SAFE (Low Risk)
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-right font-mono text-xs space-y-1 text-slate-600">
+                                <div>Total Debt + Deposit: <strong id="lease-total-liab" class="text-slate-900">205,000,000 KRW</strong></div>
+                                <div>Building Equity Buffer: <strong id="lease-equity-buffer" class="text-emerald-700">595,000,000 KRW</strong></div>
+                            </div>
+                        </div>
+
+                        <!-- Risk Progress Bar -->
+                        <div>
+                            <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                                <div id="lease-meter-bar" class="h-full rounded-full bg-emerald-500 transition-all duration-300" style="width: 25.6%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1.5">
+                                <span>0% (Debt-Free)</span>
+                                <span>60% (Safe Limit)</span>
+                                <span>75% (High-Risk Line)</span>
+                                <span>100% (Insolvent)</span>
+                            </div>
+                        </div>
+
+                        <!-- Advice Box -->
+                        <div id="lease-advice-box" class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm">
+                            Safe to sign. Ensure you get 'Hwakjeong-ilja' (fixed date stamp) and report address within 14 days.
+                        </div>
+
+                        <!-- Legal Protection Checklist -->
+                        <div class="space-y-2.5 pt-2">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Mandatory Contract Signing Checklist for Foreign Students:</h4>
+                            <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 cursor-pointer transition text-xs sm:text-sm">
+                                <input type="checkbox" checked class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500">
+                                <span>Verify landlord's Korean ID card matches Section A (Gap-gu / 갑구) owner name on <strong>Deunggibudeungbon</strong> on the day of signing.</span>
+                            </label>
+                            <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 cursor-pointer transition text-xs sm:text-sm">
+                                <input type="checkbox" checked class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500">
+                                <span>Check Section B (Eul-gu / 을구) for prior bank mortgages (<strong>Geunjeodanggwon</strong>) before sending deposit.</span>
+                            </label>
+                            <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 cursor-pointer transition text-xs sm:text-sm">
+                                <input type="checkbox" class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500">
+                                <span>Visit Hwayang-dong Community Center (Jumin Center) or Gu-Office within 14 days for <strong>Address Change Report (체류지 변경신고)</strong> & <strong>Hwakjeong-ilja (확정일자)</strong>.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- MODULE 3: D-2 VISA & 6-MONTH BUDGET        -->
+        <!-- ========================================== -->
+        <section id="panel-visa" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-md mb-1">
+                    <span>FUNC-05 • Korean Immigration D-2 Visa & Runway Simulator</span>
+                </div>
+                <h2 class="text-xl font-bold text-slate-900">D-2 Student Visa Part-Time Work (Arbeit) & 6-Month Cashflow Simulator</h2>
+                <p class="text-sm text-slate-600 mt-0.5">
+                    Simulates legal part-time work income under South Korean Ministry of Justice D-2 student visa rules (up to <strong>25 hrs/week</strong> if GPA &ge; 2.0 and TOPIK/English certified; restricted to <strong>10 hrs/week</strong> otherwise) and projects your 6-month bank balance runway.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Parameters -->
+                <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Academic, Visa & Wage Inputs</span>
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Previous GPA (0.0–4.5)</label>
+                            <input type="number" id="visa-gpa" value="3.8" min="0" max="4.5" step="0.1" oninput="updateVisaSimulation()"
+                                class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">TOPIK / IELTS Certified?</label>
+                            <select id="visa-cert" onchange="updateVisaSimulation()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white font-medium">
+                                <option value="true" selected>Yes (Qualified)</option>
+                                <option value="false">No (Unqualified)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Planned Weekly Hours</label>
+                            <input type="number" id="visa-hours" value="20" min="0" max="45" step="1" oninput="updateVisaSimulation()"
+                                class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Hourly Wage (KRW)</label>
+                            <input type="number" id="visa-wage" value="10500" min="8000" step="100" oninput="updateVisaSimulation()"
+                                class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm">
+                        </div>
+                    </div>
+                    <p id="min-wage-warning" class="hidden text-xs text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200 font-medium">
+                        ⚠️ Notice: Entered wage is below the 2026 Korean statutory minimum wage (10,030 KRW/hr).
+                    </p>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Monthly Rent + Food & Living Expenses (KRW)</label>
+                        <input type="number" id="visa-expenses" value="750000" min="100000" step="50000" oninput="updateVisaSimulation()"
+                            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Initial Bank Savings After Deposit (KRW)</label>
+                        <input type="number" id="visa-savings" value="2000000" min="0" step="100000" oninput="updateVisaSimulation()"
+                            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono text-sm">
+                    </div>
+                </div>
+
+                <!-- Right Cashflow & 6M Runway Chart -->
+                <div class="lg:col-span-7 space-y-4">
+                    <!-- Immigration Compliance Banner -->
+                    <div id="visa-status-card" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">D-2 S-Permit Compliance Check</span>
+                                <h3 id="visa-status-title" class="text-lg font-extrabold text-emerald-700 mt-0.5">
+                                    ✓ VISA COMPLIANT (20h requested / 25h max allowed)
+                                </h3>
+                            </div>
+                            <span id="visa-max-pill" class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-100 text-emerald-800">
+                                Legal Cap: 25 hrs/wk
+                            </span>
+                        </div>
+
+                        <!-- 3 Key Financial Metrics -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-xs text-slate-500 block">Legal Monthly Income</span>
+                                <strong id="visa-income-val" class="text-base font-mono text-slate-900">909,300 KRW</strong>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-xs text-slate-500 block">Monthly Total Expenses</span>
+                                <strong id="visa-expense-val" class="text-base font-mono text-slate-900">750,000 KRW</strong>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-xs text-slate-500 block">Net Monthly Cashflow</span>
+                                <strong id="visa-net-val" class="text-base font-mono text-emerald-600">+159,300 KRW</strong>
+                            </div>
+                        </div>
+
+                        <!-- 6-Month Visual Runway Bars -->
+                        <div class="pt-3">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">6-Month Bank Balance Runway Projection</span>
+                                <span class="text-xs font-mono text-slate-400">Starting Savings: <span id="visa-start-sav-label">2,000,000 KRW</span></span>
+                            </div>
+                            <div id="visa-runway-bars" class="space-y-2">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- MODULE 4: ARC DEADLINE TRACKER & JSON DB   -->
+        <!-- ========================================== -->
+        <section id="panel-deadlines" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-50 px-2.5 py-1 rounded-md mb-1">
+                    <span>FUNC-01, FUNC-02 & FUNC-06 • Immigration Deadlines & Local JSON Storage</span>
+                </div>
+                <h2 class="text-xl font-bold text-slate-900">ARC 14-Day Address Reporting & Persistent JSON Database</h2>
+                <p class="text-sm text-slate-600 mt-0.5">
+                    Under Article 36 of the Korean Immigration Control Act, foreign students with an Alien Registration Card (ARC) must report any change of residence to the local Gu-Office (e.g., Gwangjin-gu Office) within <strong>14 days of moving in</strong> or face up to a <strong>1,000,000 KRW fine</strong>.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Date Calculators -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="calendar" class="w-4 h-4 text-emerald-600"></i>
+                            <span>Enter Lease Dates</span>
+                        </h3>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Move-In / Contract Start Date</label>
+                            <input type="date" id="dl-move-date" value="2026-11-06" onchange="updateDeadlines()"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Lease Expiration Date (Typically 1 Year)</label>
+                            <input type="date" id="dl-end-date" value="2027-11-05" onchange="updateDeadlines()"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Computed Deadlines Cards -->
+                    <div class="bg-rose-50 border border-rose-200 rounded-2xl p-5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-rose-700">Mandatory 14-Day Window</span>
+                            <span class="px-2 py-0.5 text-[11px] font-bold bg-rose-200 text-rose-900 rounded">CRITICAL</span>
+                        </div>
+                        <div class="text-2xl font-extrabold font-mono text-rose-900" id="dl-arc-output">2026-11-20</div>
+                        <p class="text-xs text-rose-800">
+                            Report address change at Gwangjin-gu Office or HiKorea portal by this date to avoid up to <strong>1,000,000 KRW</strong> immigration fine.
+                        </p>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-800">60-Day Lease Notice Cutoff</span>
+                            <span class="px-2 py-0.5 text-[11px] font-bold bg-amber-200 text-amber-900 rounded">HOUSING ACT</span>
+                        </div>
+                        <div class="text-2xl font-extrabold font-mono text-amber-900" id="dl-renewal-output">2027-09-06</div>
+                        <p class="text-xs text-amber-800">
+                            Under Korean Housing Lease Law, notify your landlord at least 2 months (60 days) before lease end if moving out, otherwise the contract auto-renews (<em>Muksi-jeok Gaengsin</em>).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Live JSON Database Inspector -->
+                <div class="lg:col-span-7 bg-slate-900 rounded-2xl p-5 border border-slate-800 shadow-lg flex flex-col">
+                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="database" class="w-4 h-4 text-emerald-400"></i>
+                            <span class="text-xs sm:text-sm font-mono font-bold text-white">student_relocation_db.json (Live State)</span>
+                        </div>
+                        <button onclick="copyJsonToClipboard()" class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 transition">
+                            Copy JSON
+                        </button>
+                    </div>
+                    <pre id="json-db-viewer" class="flex-1 text-xs font-mono text-emerald-300 overflow-auto max-h-[420px] custom-scrollbar leading-relaxed"></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- MODULE 5: INTERACTIVE PYTHON CLI TERMINAL  -->
+        <!-- ========================================== -->
+        <section id="panel-terminal" class="hidden space-y-5">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md mb-1">
+                        <span>relocation_system.py • Live Execution & Unit Test Runner</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900">Interactive Python CLI Terminal & Test Case Simulator</h2>
+                    <p class="text-sm text-slate-600 mt-0.5">
+                        Click any command below to simulate executing <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">python3 relocation_system.py</code> and inspect the exact console output for your specification test cases (<code class="font-mono text-xs">TEST-01</code> to <code class="font-mono text-xs">TEST-05</code>).
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="runTerminalCommand('demo')" class="px-3.5 py-2 rounded-xl text-xs font-mono font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition">
+                        $ python3 relocation_system.py
+                    </button>
+                    <button onclick="runTerminalCommand('test-exception')" class="px-3.5 py-2 rounded-xl text-xs font-mono font-bold bg-amber-600 hover:bg-amber-500 text-white transition">
+                        Run SC-02 Exception Test
+                    </button>
+                    <button onclick="copyPythonSource()" class="px-3.5 py-2 rounded-xl text-xs font-mono font-bold bg-slate-800 hover:bg-slate-700 text-white transition">
+                        Copy Full .py Source Code
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terminal Window -->
+            <div class="bg-slate-950 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
+                <div class="bg-slate-900 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                        <span class="ml-2 text-xs font-mono text-slate-400">sazal@konkuk-univ:~/term-project$</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="runTerminalCommand('demo')" class="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Full Demo</button>
+                        <button onclick="runTerminalCommand('test1')" class="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300">TEST-01 (Housing)</button>
+                        <button onclick="runTerminalCommand('test2')" class="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300">TEST-02 (Scam Check)</button>
+                        <button onclick="runTerminalCommand('test3')" class="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300">TEST-03 (D-2 Visa)</button>
+                        <button onclick="runTerminalCommand('test4')" class="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300">TEST-04 (14-Day ARC)</button>
+                    </div>
+                </div>
+                <pre id="terminal-output" class="p-5 text-xs sm:text-sm font-mono text-emerald-400 overflow-x-auto leading-relaxed min-h-[420px] custom-scrollbar"></pre>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-10 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <div>
+                <strong>Konkuk University</strong> • Basic Programming Using Python Language (2026-2nd Semester)
+            </div>
+            <div>
+                Team / Student: <strong>Sazal Md Rashedul Islam (202616321)</strong>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- APPLICATION LOGIC (EXACT PYTHON PARITY)    -->
+    <!-- ========================================== -->
+    <script>
+        // Exchange Rates
+        const RATES = {
+            BDT: 11.5,
+            USD: 1380.0,
+            KRW: 1.0
+        };
+
+        let currentCurrency = 'BDT';
+
+        // Exact Database matching relocation_system.py
+        const db = {
+            student_profile: {
+                name: "Sazal Md Rashedul Islam",
+                student_id: "202616321",
+                Exchange_Rate_BDT_to_KRW: 11.5
+            },
+            housing_listings: [
+                {
+                    id: "H-101",
+                    name: "Hwayang-dong Smart One-Room",
+                    type: "One-Room",
+                    deposit_krw: 5000000,
+                    monthly_rent_krw: 450000,
+                    gwanlibi_krw: 60000,
+                    walk_mins_to_konkuk: 7,
+                    building_value_krw: 800000000,
+                    prior_debt_krw: 200000000
+                },
+                {
+                    id: "H-102",
+                    name: "Children's Grand Park Gosiwon",
+                    type: "Gosiwon",
+                    deposit_krw: 300000,
+                    monthly_rent_krw: 380000,
+                    gwanlibi_krw: 0,
+                    walk_mins_to_konkuk: 10,
+                    building_value_krw: 500000000,
+                    prior_debt_krw: 100000000
+                },
+                {
+                    id: "H-103",
+                    name: "Jayang-dong River View Studio",
+                    type: "One-Room",
+                    deposit_krw: 10000000,
+                    monthly_rent_krw: 550000,
+                    gwanlibi_krw: 80000,
+                    walk_mins_to_konkuk: 18,
+                    building_value_krw: 900000000,
+                    prior_debt_krw: 680000000
+                },
+                {
+                    id: "H-104",
+                    name: "Guui Station Cozy Loft",
+                    type: "One-Room",
+                    deposit_krw: 3000000,
+                    monthly_rent_krw: 420000,
+                    gwanlibi_krw: 50000,
+                    walk_mins_to_konkuk: 14,
+                    building_value_krw: 650000000,
+                    prior_debt_krw: 150000000
+                },
+                {
+                    id: "H-105",
+                    name: "KU Gate Shared Villa (2BHK)",
+                    type: "Sharehouse",
+                    deposit_krw: 2000000,
+                    monthly_rent_krw: 350000,
+                    gwanlibi_krw: 40000,
+                    walk_mins_to_konkuk: 5,
+                    building_value_krw: 700000000,
+                    prior_debt_krw: 180000000
+                }
+            ],
+            saved_analyses: [],
+            immigration_deadlines: []
+        };
+
+        // FUNC-03: Exact Python Housing Suitability Score Calculation
+        function calculateHousingScore(listing, maxDepositKrw, maxMonthlyKrw) {
+            const totalMonthly = listing.monthly_rent_krw + listing.gwanlibi_krw;
+            const deposit = listing.deposit_krw;
+            const walkMins = listing.walk_mins_to_konkuk;
+
+            // 1. Monthly Affordability Score (0 to 45 points)
+            let affordScore = 0;
+            if (totalMonthly > maxMonthlyKrw) {
+                const overRatio = (totalMonthly - maxMonthlyKrw) / maxMonthlyKrw;
+                affordScore = Math.max(0.0, 45.0 * (1.0 - overRatio * 2.0));
+            } else {
+                const savingsRatio = (maxMonthlyKrw - totalMonthly) / maxMonthlyKrw;
+                affordScore = 35.0 + (10.0 * savingsRatio);
+            }
+
+            // 2. Deposit Fit Score (0 to 30 points)
+            let depositScore = 0;
+            if (deposit > maxDepositKrw) {
+                const overDep = (deposit - maxDepositKrw) / maxDepositKrw;
+                depositScore = Math.max(0.0, 30.0 * (1.0 - overDep * 2.0));
+            } else {
+                const depRatio = (maxDepositKrw - deposit) / maxDepositKrw;
+                depositScore = 22.0 + (8.0 * depRatio);
+            }
+
+            // 3. Campus Proximity Score (0 to 25 points)
+            const proximityScore = Math.max(0.0, 25.0 - (walkMins * 1.0));
+
+            const totalScore = Math.round((affordScore + depositScore + proximityScore) * 10) / 10;
+            return {
+                ...listing,
+                total_monthly_krw: totalMonthly,
+                score: totalScore,
+                affordScore: Math.round(affordScore * 10) / 10,
+                depositScore: Math.round(depositScore * 10) / 10,
+                proximityScore: Math.round(proximityScore * 10) / 10,
+                within_budget: (deposit <= maxDepositKrw && totalMonthly <= maxMonthlyKrw)
+            };
+        }
+
+        // FUNC-04: Exact Python Lease Risk Evaluation
+        function evaluateLeaseRisk(buildingValueKrw, priorDebtKrw, depositKrw) {
+            const totalLiability = priorDebtKrw + depositKrw;
+            const riskRatio = (totalLiability / buildingValueKrw) * 100.0;
+            let level = "";
+            let advice = "";
+            let badgeColor = "";
+
+            if (riskRatio < 60.0) {
+                level = "SAFE (Low Risk)";
+                advice = "Safe to sign. Ensure you get 'Hwakjeong-ilja' (fixed date stamp) and report address within 14 days.";
+                badgeColor = "emerald";
+            } else if (riskRatio <= 75.0) {
+                level = "MODERATE RISK (Caution)";
+                advice = "Moderate encumbrance. Check 'Deunggibudeungbon' (building registry) carefully before transferring deposit.";
+                badgeColor = "amber";
+            } else {
+                level = "HIGH RISK (Danger of Deposit Loss!)";
+                advice = "DANGER! Total debt + deposit exceeds 75% of property value. Do NOT sign this lease without deposit insurance.";
+                badgeColor = "rose";
+            }
+
+            return {
+                risk_ratio_pct: Math.round(riskRatio * 100) / 100,
+                risk_level: level,
+                advice: advice,
+                color: badgeColor
+            };
+        }
+
+        // Switch Navigation Tabs
+        function switchTab(tabName) {
+            const tabs = ['housing', 'lease', 'visa', 'deadlines', 'terminal'];
+            tabs.forEach(t => {
+                const panel = document.getElementById(`panel-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabName) {
+                    panel.classList.remove('hidden');
+                    btn.className = "tab-active flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition";
+                } else {
+                    panel.classList.add('hidden');
+                    btn.className = "text-slate-600 hover:bg-slate-100 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition";
+                }
+            });
+            if (tabName === 'deadlines') {
+                updateDeadlines();
+            }
+        }
+
+        // Currency Switcher
+        function setCurrency(curr) {
+            const prevRate = RATES[currentCurrency];
+            const newRate = RATES[curr];
+
+            const depInput = document.getElementById('input-deposit');
+            const monInput = document.getElementById('input-monthly');
+
+            const depKrw = (parseFloat(depInput.value) || 0) * prevRate;
+            const monKrw = (parseFloat(monInput.value) || 0) * prevRate;
+
+            currentCurrency = curr;
+            depInput.value = Math.round(depKrw / newRate);
+            monInput.value = Math.round(monKrw / newRate);
+
+            ['BDT', 'KRW', 'USD'].forEach(c => {
+                const btn = document.getElementById(`curr-${c}`);
+                if (c === curr) {
+                    btn.className = "py-2 px-3 rounded-xl text-xs font-bold border transition bg-emerald-600 text-white border-emerald-600";
+                } else {
+                    btn.className = "py-2 px-3 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100";
+                }
+            });
+
+            updateHousingScores();
+        }
+
+        function applyBudgetPreset(curr, dep, mon) {
+            currentCurrency = curr;
+            document.getElementById('input-deposit').value = dep;
+            document.getElementById('input-monthly').value = mon;
+            ['BDT', 'KRW', 'USD'].forEach(c => {
+                const btn = document.getElementById(`curr-${c}`);
+                btn.className = (c === curr)
+                    ? "py-2 px-3 rounded-xl text-xs font-bold border transition bg-emerald-600 text-white border-emerald-600"
+                    : "py-2 px-3 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100";
+            });
+            updateHousingScores();
+            showToast(`Loaded ${curr} budget preset!`);
+        }
+
+        // Render Ranked Housing Cards
+        function updateHousingScores() {
+            const rawDep = Math.max(1, parseFloat(document.getElementById('input-deposit').value) || 0);
+            const rawMon = Math.max(1, parseFloat(document.getElementById('input-monthly').value) || 0);
+
+            const maxDepKrw = Math.round(rawDep * RATES[currentCurrency]);
+            const maxMonKrw = Math.round(rawMon * RATES[currentCurrency]);
+
+            document.getElementById('converted-deposit-label').textContent = `≈ ${maxDepKrw.toLocaleString()} KRW`;
+            document.getElementById('converted-monthly-label').textContent = `≈ ${maxMonKrw.toLocaleString()} KRW`;
+
+            const ranked = db.housing_listings.map(item => calculateHousingScore(item, maxDepKrw, maxMonKrw));
+            ranked.sort((a, b) => b.score - a.score);
+
+            document.getElementById('housing-count-badge').textContent = `${ranked.length} Listings Evaluated`;
+
+            const container = document.getElementById('housing-cards-container');
+            container.innerHTML = ranked.map((r, idx) => {
+                const risk = evaluateLeaseRisk(r.building_value_krw, r.prior_debt_krw, r.deposit_krw);
+                const moveInKrw = r.deposit_krw + r.total_monthly_krw;
+                const moveInBdt = Math.round(moveInKrw / RATES.BDT);
+
+                const badgeHtml = r.within_budget
+                    ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ WITHIN BUDGET</span>`
+                    : `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">OVER BUDGET</span>`;
+
+                const riskBadgeHtml = risk.color === 'emerald'
+                    ? `<span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Lease Risk: ${risk.risk_ratio_pct}% (SAFE)</span>`
+                    : `<span class="text-xs font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">⚠️ Lease Risk: ${risk.risk_ratio_pct}% (HIGH RISK)</span>`;
+
+                return `
+                <div class="bg-white rounded-2xl p-5 border ${idx === 0 ? 'border-emerald-500 ring-2 ring-emerald-500/15' : 'border-slate-200'} shadow-sm transition hover:shadow-md">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-xl ${idx === 0 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'} font-mono font-bold text-sm flex items-center justify-center">
+                                #${idx + 1}
+                            </span>
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-xs font-mono font-bold text-slate-400">${r.id}</span>
+                                    <h4 class="text-base font-bold text-slate-900">${r.name}</h4>
+                                    <span class="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-medium">${r.type}</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-0.5">
+                                    🚶 <strong>${r.walk_mins_to_konkuk} mins walk</strong> to Konkuk Univ. Gate &nbsp;•&nbsp; 1st Month Move-in: <strong>${moveInKrw.toLocaleString()} KRW</strong> (~${moveInBdt.toLocaleString()} BDT)
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 self-start sm:self-center">
+                            ${badgeHtml}
+                            <div class="text-right bg-slate-900 text-white px-3 py-1.5 rounded-xl font-mono">
+                                <span class="text-xs text-slate-400 block leading-none">Score</span>
+                                <strong class="text-base text-emerald-400">${r.score}/100</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-3 text-xs">
+                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 block">Security Deposit (Bojeung-geum)</span>
+                            <strong class="font-mono text-sm text-slate-800">${r.deposit_krw.toLocaleString()} KRW</strong>
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 block">Monthly Rent + Gwanlibi</span>
+                            <strong class="font-mono text-sm text-slate-800">${r.total_monthly_krw.toLocaleString()} KRW</strong>
+                            <span class="text-[11px] text-slate-400">(${r.monthly_rent_krw.toLocaleString()} + ${r.gwanlibi_krw.toLocaleString()})</span>
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex flex-col justify-between">
+                            <span class="text-slate-400 block">Deunggibudeungbon Safety</span>
+                            <div class="mt-0.5">${riskBadgeHtml}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+                        <div class="flex flex-wrap items-center gap-3 text-[11px] font-mono text-slate-500">
+                            <span>Affordability: <strong>${r.affordScore}/45</strong></span>
+                            <span>Deposit Fit: <strong>${r.depositScore}/30</strong></span>
+                            <span>Proximity: <strong>${r.proximityScore}/25</strong></span>
+                        </div>
+                        <button onclick="inspectPropertyInLeaseTab('${r.id}')" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition">
+                            Inspect Lease Scam Risk →
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            renderLeasePresetButtons();
+        }
+
+        function addCustomListing() {
+            const name = document.getElementById('new-room-name').value.trim() || "Custom Konkuk Studio";
+            const type = document.getElementById('new-room-type').value;
+            const walk = parseInt(document.getElementById('new-room-walk').value) || 10;
+            const dep = parseFloat(document.getElementById('new-room-dep').value) || 3000000;
+            const rent = parseFloat(document.getElementById('new-room-rent').value) || 400000;
+            const gwan = parseFloat(document.getElementById('new-room-gwan').value) || 50000;
+
+            const newId = `H-10${db.housing_listings.length + 1}`;
+            db.housing_listings.push({
+                id: newId,
+                name: name,
+                type: type,
+                deposit_krw: dep,
+                monthly_rent_krw: rent,
+                gwanlibi_krw: gwan,
+                walk_mins_to_konkuk: walk,
+                building_value_krw: 750000000,
+                prior_debt_krw: 180000000
+            });
+
+            document.getElementById('new-room-name').value = "";
+            updateHousingScores();
+            showToast(`Added ${newId}: ${name} to database!`);
+        }
+
+        // Module 2 Helpers
+        function renderLeasePresetButtons() {
+            const container = document.getElementById('lease-preset-buttons');
+            container.innerHTML = db.housing_listings.map(item => `
+                <button onclick="loadLeaseProperty('${item.id}')" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 text-slate-700 font-medium border border-slate-200 transition">
+                    ${item.id}: ${item.name.split(' ')[0]}
+                </button>
+            `).join('');
+        }
+
+        function loadLeaseProperty(id) {
+            const item = db.housing_listings.find(h => h.id === id);
+            if (!item) return;
+            document.getElementById('lease-bldg-val').value = item.building_value_krw;
+            document.getElementById('lease-prior-debt').value = item.prior_debt_krw;
+            document.getElementById('lease-deposit').value = item.deposit_krw;
+            runLeaseRiskAnalysis();
+            showToast(`Loaded registry data for ${item.name}`);
+        }
+
+        function inspectPropertyInLeaseTab(id) {
+            switchTab('lease');
+            loadLeaseProperty(id);
+        }
+
+        function runLeaseRiskAnalysis() {
+            const bldgVal = Math.max(1, parseFloat(document.getElementById('lease-bldg-val').value) || 1);
+            const priorDebt = Math.max(0, parseFloat(document.getElementById('lease-prior-debt').value) || 0);
+            const deposit = Math.max(0, parseFloat(document.getElementById('lease-deposit').value) || 0);
+
+            const res = evaluateLeaseRisk(bldgVal, priorDebt, deposit);
+            const totalLiab = priorDebt + deposit;
+            const buffer = bldgVal - totalLiab;
+
+            document.getElementById('lease-ratio-text').textContent = `${res.risk_ratio_pct}%`;
+            document.getElementById('lease-total-liab').textContent = `${totalLiab.toLocaleString()} KRW`;
+            document.getElementById('lease-equity-buffer').textContent = `${buffer.toLocaleString()} KRW`;
+
+            const badge = document.getElementById('lease-badge');
+            const meter = document.getElementById('lease-meter-bar');
+            const adviceBox = document.getElementById('lease-advice-box');
+
+            meter.style.width = `${Math.min(100, res.risk_ratio_pct)}%`;
+
+            if (res.color === 'emerald') {
+                badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800";
+                meter.className = "h-full rounded-full bg-emerald-500 transition-all duration-300";
+                adviceBox.className = "p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm font-medium";
+            } else if (res.color === 'amber') {
+                badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800";
+                meter.className = "h-full rounded-full bg-amber-500 transition-all duration-300";
+                adviceBox.className = "p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm font-medium";
+            } else {
+                badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 animate-pulse";
+                meter.className = "h-full rounded-full bg-rose-600 transition-all duration-300";
+                adviceBox.className = "p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-sm font-bold";
+            }
+
+            badge.textContent = res.risk_level;
+            adviceBox.textContent = res.advice;
+        }
+
+        // FUNC-05: D-2 Visa & 6-Month Budget Simulator
+        function updateVisaSimulation() {
+            const gpa = parseFloat(document.getElementById('visa-gpa').value) || 0;
+            const hasCert = document.getElementById('visa-cert').value === 'true';
+            const reqHours = parseFloat(document.getElementById('visa-hours').value) || 0;
+            const wage = parseFloat(document.getElementById('visa-wage').value) || 0;
+            const expenses = parseFloat(document.getElementById('visa-expenses').value) || 0;
+            const savings = parseFloat(document.getElementById('visa-savings').value) || 0;
+
+            const minWageWarn = document.getElementById('min-wage-warning');
+            if (wage < 10030) {
+                minWageWarn.classList.remove('hidden');
+            } else {
+                minWageWarn.classList.add('hidden');
+            }
+
+            const legalMaxHours = (gpa >= 2.0 && hasCert) ? 25 : 10;
+            const isCompliant = reqHours <= legalMaxHours;
+            const effectiveHours = Math.min(reqHours, legalMaxHours);
+
+            const monthlyIncome = Math.floor(effectiveHours * 4.33 * wage);
+            const netCashflow = monthlyIncome - expenses;
+
+            const statusTitle = document.getElementById('visa-status-title');
+            const maxPill = document.getElementById('visa-max-pill');
+
+            if (isCompliant) {
+                statusTitle.className = "text-lg font-extrabold text-emerald-700 mt-0.5";
+                statusTitle.textContent = `✓ VISA COMPLIANT (${reqHours}h requested / ${legalMaxHours}h max allowed)`;
+                maxPill.className = "px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-100 text-emerald-800";
+            } else {
+                statusTitle.className = "text-lg font-extrabold text-rose-600 mt-0.5";
+                statusTitle.textContent = `⚠️ IMMIGRATION VIOLATION WARNING (${reqHours}h exceeds ${legalMaxHours}h cap! Capped at ${legalMaxHours}h)`;
+                maxPill.className = "px-3 py-1 rounded-full text-xs font-mono font-bold bg-rose-100 text-rose-800";
+            }
+            maxPill.textContent = `Legal Cap: ${legalMaxHours} hrs/wk`;
+
+            document.getElementById('visa-income-val').textContent = `${monthlyIncome.toLocaleString()} KRW`;
+            document.getElementById('visa-expense-val').textContent = `${expenses.toLocaleString()} KRW`;
+
+            const netEl = document.getElementById('visa-net-val');
+            netEl.textContent = `${netCashflow >= 0 ? '+' : ''}${netCashflow.toLocaleString()} KRW`;
+            netEl.className = netCashflow >= 0 ? "text-base font-mono text-emerald-600" : "text-base font-mono text-rose-600";
+
+            document.getElementById('visa-start-sav-label').textContent = `${savings.toLocaleString()} KRW`;
+
+            // 6-Month Projection
+            let balance = savings;
+            const months = [];
+            let maxAbs = Math.max(savings, 1000000);
+            for (let m = 1; m <= 6; m++) {
+                balance += netCashflow;
+                months.push({ month: m, ending: balance });
+                if (Math.abs(balance) > maxAbs) maxAbs = Math.abs(balance);
+            }
+
+            const barsContainer = document.getElementById('visa-runway-bars');
+            barsContainer.innerHTML = months.map(item => {
+                const isPositive = item.ending >= 0;
+                const widthPct = Math.min(100, Math.max(8, Math.round((Math.abs(item.ending) / maxAbs) * 100)));
+                return `
+                <div class="flex items-center gap-3 text-xs font-mono">
+                    <span class="w-16 text-slate-500 font-semibold">Month ${item.month}</span>
+                    <div class="flex-1 h-6 bg-slate-100 rounded-lg overflow-hidden p-0.5 border border-slate-200">
+                        <div class="h-full rounded-md ${isPositive ? 'bg-emerald-500' : 'bg-rose-500'} transition-all duration-300" style="width: ${widthPct}%"></div>
+                    </div>
+                    <span class="w-36 text-right font-bold ${isPositive ? 'text-slate-800' : 'text-rose-600'}">
+                        ${item.ending.toLocaleString()} KRW ${!isPositive ? '(DEFICIT)' : ''}
+                    </span>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // FUNC-06: Deadlines & JSON Inspector
+        function updateDeadlines() {
+            const moveStr = document.getElementById('dl-move-date').value || "2026-11-06";
+            const endStr = document.getElementById('dl-end-date').value || "2027-11-05";
+
+            const moveDate = new Date(moveStr + "T00:00:00");
+            const endDate = new Date(endStr + "T00:00:00");
+
+            const arcDeadline = new Date(moveDate);
+            arcDeadline.setDate(arcDeadline.getDate() + 14);
+
+            const renewalNotice = new Date(endDate);
+            renewalNotice.setDate(renewalNotice.getDate() - 60);
+
+            const fmt = d => d.toISOString().split('T')[0];
+
+            const arcStr = fmt(arcDeadline);
+            const renStr = fmt(renewalNotice);
+
+            document.getElementById('dl-arc-output').textContent = arcStr;
+            document.getElementById('dl-renewal-output').textContent = renStr;
+
+            db.immigration_deadlines = [{
+                move_in_date: moveStr,
+                arc_address_report_deadline: arcStr,
+                lease_notice_deadline_60d: renStr,
+                lease_end_date: endStr,
+                fine_warning: "Failure to report address change at Gu-office/HiKorea within 14 days incurs up to 1,000,000 KRW fine."
+            }];
+
+            document.getElementById('json-db-viewer').textContent = JSON.stringify(db, null, 4);
+        }
+
+        // Terminal Outputs matching relocation_system.py
+        function runTerminalCommand(cmd) {
+            const out = document.getElementById('terminal-output');
+            if (cmd === 'demo') {
+                out.textContent = `$ python3 relocation_system.py
+==============================================================================
+ SMART RELOCATION, LEASE ANALYZER & VISA SURVIVAL SYSTEM (KONKUK UNIV.)
+ Student: Sazal Md Rashedul Islam (202616321)
+==============================================================================
+
+[MODULE 1] Smart Housing Recommender (Budget: 5,000,000 KRW Deposit / 520,000 KRW Monthly)
+------------------------------------------------------------------------------
+ID      Housing Name                     Deposit(KRW)   Monthly(KRW)   Walk   Score
+H-105   KU Gate Shared Villa (2BHK)        2,000,000       390,000    5m    84.3/100 [OK]
+H-102   Children's Grand Park Gosiwon        300,000       380,000   10m    82.2/100 [OK]
+H-104   Guui Station Cozy Loft             3,000,000       470,000   14m    72.2/100 [OK]
+H-101   Hwayang-dong Smart One-Room        5,000,000       510,000    7m    70.2/100 [OK]
+H-103   Jayang-dong River View Studio     10,000,000       630,000   18m    33.0/100 [OVER]
+
+[MODULE 2] Korean Lease Scam & Deposit Risk Analyzer
+------------------------------------------------------------------------------
+* Hwayang-dong Smart One-Room: Liability Ratio = 25.62% -> SAFE (Low Risk)
+  Advice: Safe to sign. Ensure you get 'Hwakjeong-ilja' (fixed date stamp) and report address within 14 days.
+* Jayang-dong River View Studio: Liability Ratio = 76.67% -> HIGH RISK (Danger of Deposit Loss!)
+  Advice: DANGER! Total debt + deposit exceeds 75% of property value. Do NOT sign this lease without deposit insurance.
+
+[MODULE 3] D-2 Student Visa Part-Time Work & 6-Month Budget Simulator
+------------------------------------------------------------------------------
+Visa Status: COMPLIANT (Requested: 20h/wk, Max Allowed: 25h/wk)
+Legal Monthly Part-Time Income : 909,300 KRW
+Total Monthly Living Expenses  : 750,000 KRW
+Net Monthly Savings/Cashflow   : +159,300 KRW
+6-Month Bank Balance Runway    : M1: 2,159,300 -> M2: 2,318,600 -> M3: 2,477,900 -> M4: 2,637,200 -> M5: 2,796,500 -> M6: 2,955,800
+
+[MODULE 4] ARC Address Reporting & Lease Expiry Tracker
+------------------------------------------------------------------------------
+Move-in Date                   : 2026-11-06
+14-Day ARC Address Report Due  : 2026-11-20 (CRITICAL!)
+60-Day Lease Renewal Notice    : 2027-09-06
+Note: Failure to report address change at Gu-office/HiKorea within 14 days incurs up to 1,000,000 KRW fine.
+
+[SUCCESS] All results saved to 'student_relocation_db.json'.
+==============================================================================`;
+            } else if (cmd === 'test-exception') {
+                out.textContent = `$ python3 relocation_system.py --interactive
+
+=== KONKUK INTERNATIONAL STUDENT RELOCATION & VISA SYSTEM ===
+1. Search & Rank Housing Near Campus (BDT/KRW Budget)
+2. Check Lease Contract Scam Risk (Deunggibudeungbon Analyzer)
+3. Simulate D-2 Visa Part-Time Work & 6-Month Budget
+4. Calculate ARC 14-Day Address Report & Lease Deadlines
+5. Run Full Automated Demo Suite
+0. Exit
+Select an option (0-5): 1
+Enter max deposit in KRW (e.g., 5000000): -500000
+Enter max monthly budget in KRW (e.g., 500000): 500000
+[Input Validation Exception] Budget limits must be positive numbers greater than zero.
+
+Select an option (0-5): ^C
+[Signal Handled] Graceful shutdown initiated. Saving data...`;
+            } else if (cmd === 'test1') {
+                out.textContent = `[UNIT TEST-01] Testing FUNC-03: calculate_housing_score()
+Input : H-105 (KU Gate Shared Villa), Max Deposit = 5,000,000 KRW, Max Monthly = 520,000 KRW
+Output: {
+  "id": "H-105",
+  "name": "KU Gate Shared Villa (2BHK)",
+  "score": 84.3,
+  "within_budget": true
+}
+Status: PASS ✅`;
+            } else if (cmd === 'test2') {
+                out.textContent = `[UNIT TEST-02] Testing FUNC-04: evaluate_lease_risk() on High-Risk Property H-103
+Input : Building Value = 900,000,000 KRW, Prior Debt = 680,000,000 KRW, Deposit = 10,000,000 KRW
+Output: {
+  "risk_ratio_pct": 76.67,
+  "risk_level": "HIGH RISK (Danger of Deposit Loss!)"
+}
+Status: PASS ✅`;
+            } else if (cmd === 'test3') {
+                out.textContent = `[UNIT TEST-03] Testing FUNC-05: simulate_visa_budget()
+Input : GPA = 3.8, Certified = True, Wage = 10,500 KRW, Hours = 20h/wk, Expenses = 750,000 KRW
+Output: Legal Max Hours = 25h/wk, Monthly Legal Income = 909,300 KRW, Net Cashflow = +159,300 KRW, Month 6 Balance = 2,955,800 KRW
+Status: PASS ✅`;
+            } else if (cmd === 'test4') {
+                out.textContent = `[UNIT TEST-04] Testing FUNC-06: track_immigration_deadlines()
+Input : Move-in Date = "2026-11-06", Lease End Date = "2027-11-05"
+Output: {
+  "arc_address_report_deadline": "2026-11-20",
+  "lease_notice_deadline_60d": "2027-09-06"
+}
+Status: PASS ✅`;
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2800);
+        }
+
+        function copyTextFallback(text, msg) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast(msg);
+        }
+
+        function copyJsonToClipboard() {
+            copyTextFallback(JSON.stringify(db, null, 4), "Copied student_relocation_db.json to clipboard!");
+        }
+
+        function downloadJsonDb() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 4));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "student_relocation_db.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            showToast("Downloaded student_relocation_db.json!");
+        }
+
+        function copyPythonSource() {
+            const pyCode = document.getElementById('terminal-output').textContent;
+            copyTextFallback(pyCode, "Copied terminal output to clipboard!");
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            updateHousingScores();
+            runLeaseRiskAnalysis();
+            updateVisaSimulation();
+            updateDeadlines();
+            runTerminalCommand('demo');
+        };
+    </script>
+</body>
+</html>
